@@ -1,0 +1,171 @@
+:host {
+  display: block;
+  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden; 
+}
+
+.main-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  background-color: #5c9e38; /* Fundo verde para preencher espaços vazios */
+}
+
+/* --- BOTÃO MENU --- */
+.menu-btn {
+  position: absolute; top: 20px; left: 20px; z-index: 100;
+  background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(5px);
+  border: none; font-size: 24px; padding: 10px 15px; border-radius: 8px;
+  cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); transition: 0.2s;
+  color: #333;
+  &:hover { transform: scale(1.05); background: white; }
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+  position: fixed; top: 0; left: -350px; width: 300px; height: 100vh;
+  background: rgba(30, 30, 30, 0.98); color: white; display: flex;
+  flex-direction: column; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+  z-index: 200; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  &.open { left: 0; }
+
+  .sidebar-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+    h2 { margin: 0; color: #4caf50; font-size: 1.5rem; }
+    .close-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; &:hover { color: #f55; } }
+  }
+
+  .search-box input {
+    width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px;
+    border: 1px solid #444; background: #222; color: white;
+    &:focus { outline: none; border-color: #4caf50; }
+  }
+
+  .location-list {
+    list-style: none; padding: 0; overflow-y: auto;
+    li {
+      padding: 15px 10px; border-bottom: 1px solid #444; cursor: pointer; transition: 0.2s;
+      &:hover { background: #444; border-left: 4px solid #4caf50; padding-left: 14px; }
+      &.active { background: #3a3a3a; border-left: 4px solid #ffff00; color: #ffff00; }
+    }
+  }
+}
+
+/* --- MAPA (CORREÇÃO DE ESTABILIDADE) --- */
+.map-area {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  overflow: auto; /* Scroll nativo se o mapa for grande */
+  z-index: 1;
+  /* Centraliza o mapa se ele for menor que a tela */
+  display: grid;
+  place-items: center; 
+}
+
+.map-container {
+  position: relative;
+  /* inline-block faz o container ter EXATAMENTE o tamanho da imagem */
+  display: inline-block; 
+  /* Garante que o modal não seja cortado se sair um pouco */
+  overflow: visible; 
+  
+  .mapa-imagem {
+    display: block;
+    max-height: 100vh; /* Tenta ajustar na altura da tela */
+    width: auto;       /* Mantém a proporção */
+    /* Se preferir o mapa gigante original, remova o max-height */
+  }
+}
+
+/* --- SVG OVERLAY --- */
+.map-overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 5;
+}
+.selection-polygon {
+  fill: rgba(255, 255, 0, 0.2); stroke: #ffff00; stroke-width: 0.8;
+  vector-effect: non-scaling-stroke; animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%, 100% { stroke-opacity: 1; fill-opacity: 0.2; } 50% { stroke-opacity: 0.5; fill-opacity: 0.05; } }
+
+/* --- PINO --- */
+.map-pin {
+  position: absolute; transform: translate(-50%, -100%);
+  background: none; border: none; font-size: 3rem; cursor: pointer;
+  z-index: 10; transition: 0.3s; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));
+  &:hover { transform: translate(-50%, -120%) scale(1.1); z-index: 100; }
+  &.selected { transform: translate(-50%, -125%) scale(1.2); filter: drop-shadow(0 0 15px #ffff00); z-index: 100; }
+}
+
+/* --- MODAL FLUTUANTE (BLINDADO CONTRA BUGS) --- */
+.modal-popup {
+  position: absolute;
+  width: 320px; /* Largura Fixa */
+  max-width: 90vw; /* Segurança para mobile */
+  background-color: #1e1e1e;
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #333;
+  animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  .modal-header {
+    padding: 12px 16px; background: #181818; border-bottom: 1px solid #333;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    h3 { margin: 0; font-size: 1rem; color: #eee; max-width: 85%; }
+    .modal-close { background: none; border: none; color: #888; font-size: 1.2rem; cursor: pointer; &:hover { color: white; } }
+  }
+
+  .modal-tabs {
+    display: flex; background: #252525; border-bottom: 1px solid #333;
+    button {
+      flex: 1; padding: 10px; background: none; border: none; color: #888; font-size: 1.2rem; cursor: pointer; position: relative;
+      &:hover { background: #333; color: #ddd; }
+      &.active { color: #4caf50; background: #1e1e1e; &::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: #4caf50; } }
+    }
+  }
+
+  .modal-content-body {
+    height: 200px; /* Altura Fixa Rígida */
+    background: #1e1e1e;
+    overflow-y: auto; /* Scroll interno se o texto for grande */
+    overflow-x: hidden;
+    position: relative;
+    
+    /* PROTEÇÃO PARA IMAGENS */
+    .tab-foto {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+
+    .tab-info { padding: 15px; font-size: 0.9rem; line-height: 1.5; color: #ccc; hr { border-color: #333; margin: 10px 0; } }
+
+    .tab-salas {
+      padding: 10px;
+      .empty-msg { text-align: center; color: #666; margin-top: 60px; font-style: italic; }
+      .salas-container { display: flex; flex-direction: column; gap: 8px; }
+      .sala-row {
+        display: flex; background: #2a2a2a; border-radius: 6px; overflow: hidden; border: 1px solid #333;
+        .sala-andar { background-color: #5c8d5d; color: white; padding: 10px; width: 80px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; text-align: center; flex-shrink: 0; }
+        .sala-info { padding: 10px; display: flex; align-items: center; font-size: 0.9rem; color: #eee; line-height: 1.3; }
+      }
+    }
+  }
+}
+
+@keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }

@@ -1,0 +1,102 @@
+<div class="main-container">
+  
+  <!-- BOTÃO HAMBÚRGUER -->
+  @if (!menuAberto) {
+    <button class="menu-btn" (click)="toggleMenu()">☰</button>
+  }
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" [class.open]="menuAberto">
+    <div class="sidebar-header">
+      <h2>📍 Mapa UESC</h2>
+      <button class="close-btn" (click)="toggleMenu()">✕</button>
+    </div>
+    <div class="search-box">
+      <input type="text" placeholder="Pesquise um local...">
+    </div>
+    <ul class="location-list">
+      @for (local of locais; track local.id) {
+        <li (click)="abrirModal(local)" [class.active]="localSelecionado?.id === local.id">
+          <strong>{{ local.nome }}</strong>
+        </li>
+      } @empty { <li>Carregando locais...</li> }
+    </ul>
+  </div>
+
+  <!-- ÁREA DO MAPA -->
+  <div class="map-area" (click)="menuAberto = false">
+    <!-- O container agora abraça a imagem perfeitamente -->
+    <div class="map-container">
+      
+      <!-- IMAGEM -->
+      <img src="assets/mapa-base.png" alt="Mapa da UESC" class="mapa-imagem" style="cursor: crosshair" (click)="capturarCoordenadas($event)">
+      
+      <!-- SVG AMARELO -->
+      <svg class="map-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+        @if (localSelecionado) {
+          <polygon [attr.points]="getPoligonoSelecao()" class="selection-polygon" />
+          <line [attr.x1]="localSelecionado.coordenadaX" [attr.y1]="localSelecionado.coordenadaY" [attr.x2]="localSelecionado.coordenadaX" [attr.y2]="localSelecionado.coordenadaY - 10" stroke="white" stroke-width="0.2" stroke-dasharray="1,1" />
+        }
+      </svg>
+
+      <!-- PINOS -->
+      @for (local of locais; track local.id) {
+        <button class="map-pin" [class.selected]="localSelecionado?.id === local.id" [style.left.%]="local.coordenadaX" [style.top.%]="local.coordenadaY" (click)="abrirModal(local); $event.stopPropagation()" title="{{ local.nome }}">
+          📍
+        </button>
+      }
+
+      <!-- MODAL FLUTUANTE -->
+      @if (localSelecionado) {
+        <div class="modal-popup" [ngStyle]="posicaoModal" (click)="$event.stopPropagation()">
+          
+          <div class="modal-header">
+            <h3>{{ localSelecionado.nome }}</h3>
+            <button class="modal-close" (click)="fecharModal()">✕</button>
+          </div>
+
+          <div class="modal-tabs">
+            <button [class.active]="abaAtual === 'foto'" (click)="mudarAba('foto')" title="Ver Foto">📷</button>
+            <button [class.active]="abaAtual === 'salas'" (click)="mudarAba('salas')" title="Ver Salas">🚪</button>
+            <button [class.active]="abaAtual === 'info'" (click)="mudarAba('info')" title="Informações">ℹ️</button>
+          </div>
+
+          <div class="modal-content-body">
+            <!-- FOTO -->
+            @if (abaAtual === 'foto') {
+              <div class="tab-foto fade-in">
+                <img [src]="'assets/' + localSelecionado.urlImagem" alt="Foto do Local" onerror="this.src='assets/mapa-base.png'">
+              </div>
+            }
+            <!-- SALAS -->
+            @if (abaAtual === 'salas') {
+              <div class="tab-salas fade-in">
+                @if (getListaSalas().length > 0) {
+                  <div class="salas-container">
+                    @for (item of getListaSalas(); track $index) {
+                      <div class="sala-row">
+                        <div class="sala-andar">{{ item.andar }}</div>
+                        <div class="sala-info">{{ item.salas }}</div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="empty-msg">Sem informações de salas.</p>
+                }
+              </div>
+            }
+            <!-- INFO -->
+            @if (abaAtual === 'info') {
+              <div class="tab-info fade-in">
+                <p>{{ localSelecionado.descricao }}</p>
+                <hr>
+                <small>ID: {{ localSelecionado.id }}</small>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>
