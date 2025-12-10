@@ -26,5 +26,9 @@ public class Local {
     private Double coordenadaX; 
     private Double coordenadaY;
 
+    // Coordenadas geográficas reais (para rotas no Google Maps)
+    private Double latitude;
+    private Double longitude;
+
     private String urlImagem; // Nome do arquivo da imagem ou URL
 }

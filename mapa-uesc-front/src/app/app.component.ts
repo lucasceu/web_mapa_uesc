@@ -207,4 +207,19 @@ export class AppComponent implements OnInit {
     const img = event.target as HTMLImageElement;
     img.src = 'assets/mapa-base.png';
   }
+
+  /**
+   * Abre o Google Maps em nova aba com rota a pé até o local selecionado.
+   * Usa a localização atual do usuário como origem.
+   */
+  abrirRota(local: Local): void {
+    if (!local.latitude || !local.longitude) {
+      alert('Coordenadas de rota não disponíveis para este local.');
+      return;
+    }
+
+    const destino = `${local.latitude},${local.longitude}`;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${destino}&travelmode=walking`;
+    window.open(url, '_blank');
+  }
 }

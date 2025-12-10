@@ -7,3 +7,7 @@ dist/
 target/
 *.class
 .mvn/
+
+# IDEs and editors
+.pdf
+.zip

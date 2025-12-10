@@ -13,6 +13,8 @@ export interface Local {
   detalhesSalas?: string;  // pode vir null do backend
   coordenadaX: number;
   coordenadaY: number;
+  latitude?: number;   // coordenadas geográficas para rota
+  longitude?: number;
   urlImagem: string;
 }
 

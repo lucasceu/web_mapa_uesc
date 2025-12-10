@@ -246,41 +246,49 @@
   pointer-events: none;
 }
 
-/* PINOS */
+/* PINOS NO MAPA */
 
 .map-pin {
   position: absolute;
-  transform: translate(-50%, -100%);
+  /* agora o centro do pino fica exatamente na coordenada (X, Y) */
+  transform: translate(-50%, -50%);
   border: none;
-  background: none;
+  background: transparent;
+  padding: 0;
   cursor: pointer;
 }
 
-/* pino fica invisível até o mouse passar por cima da área dele */
+/* ponto azul bonitinho, pequeno e redondo */
 .map-pin .pin-dot {
-  width: 16px;
-  height: 16px;
+  display: block;
+  width: 14px;
+  height: 14px;
   border-radius: 999px;
-  background: #ef4444;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   border: 2px solid #ffffff;
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.5);
-  transition: 0.2s;
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.35),
+    0 3px 8px rgba(15, 23, 42, 0.4);
+  transition: 0.2s ease;
   opacity: 0;
   transform: scale(0.4);
 }
 
+/* aparece quando o mouse passa em cima da área do pino */
 .map-pin:hover .pin-dot {
   opacity: 1;
   transform: scale(1);
 }
 
-/* se quiser que o pino continue visível enquanto o modal daquele local estiver aberto,
-   pode manter isso; se quiser que suma depois do clique, pode remover */
+/* quando o local está selecionado (modal aberto) */
 .map-pin.selected .pin-dot {
-  background: #2563eb;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.5);
+  opacity: 1;
+  transform: scale(1);
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  box-shadow:
+    0 0 0 5px rgba(37, 99, 235, 0.45),
+    0 4px 10px rgba(15, 23, 42, 0.5);
 }
-
 /* MODAL */
 
 .modal-popup {
@@ -456,6 +464,41 @@
 .tab-info .id-info {
   font-size: 0.75rem;
   color: #9ca3af;
+}
+
+/* FOOTER DO MODAL - BOTÃO ROTA */
+
+.modal-footer {
+  padding: 10px;
+  border-top: 1px solid #1f2937;
+  background: #020617;
+}
+
+.btn-rota {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: 0.2s;
+
+  &:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 /* ANIMAÇÃO DO MODAL */
