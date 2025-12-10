@@ -1,73 +1,143 @@
 <div class="main-container">
-  
-  <!-- BOTÃO HAMBÚRGUER -->
+  <!-- BOTÃO HAMBÚRGUER (quando menu fechado – efeito visual só no mobile) -->
   @if (!menuAberto) {
     <button class="menu-btn" (click)="toggleMenu()">☰</button>
   }
 
   <!-- SIDEBAR -->
-  <div class="sidebar" [class.open]="menuAberto">
+  <aside class="sidebar" [class.open]="menuAberto">
     <div class="sidebar-header">
-      <h2>📍 Mapa UESC</h2>
+      <div class="sidebar-title">
+        <h2>📍 Mapa UESC</h2>
+        <p>Encontre prédios, salas e setores do campus</p>
+      </div>
       <button class="close-btn" (click)="toggleMenu()">✕</button>
     </div>
+
     <div class="search-box">
-      <input type="text" placeholder="Pesquise um local...">
+      <input
+        type="text"
+        placeholder="Pesquise por nome, prédio ou sala..."
+        [(ngModel)]="termoBusca"
+        (input)="filtrarLocais()"
+      />
+
+      <!-- AUTOCOMPLETE / SUGESTÕES -->
+      @if (mostrarSugestoes && locaisFiltrados.length > 0) {
+        <ul class="search-suggestions">
+          @for (local of locaisFiltrados; track local.id) {
+            <li (click)="selecionarSugestao(local)">
+              {{ local.nome }}
+            </li>
+          }
+        </ul>
+      }
     </div>
-    <ul class="location-list">
-      @for (local of locais; track local.id) {
-        <li (click)="abrirModal(local)" [class.active]="localSelecionado?.id === local.id">
-          <strong>{{ local.nome }}</strong>
-        </li>
-      } @empty { <li>Carregando locais...</li> }
-    </ul>
-  </div>
+
+    <div class="sidebar-body">
+      @if (carregando) {
+        <p class="status-msg">Carregando locais...</p>
+      } @else if (erroCarregamento) {
+        <p class="status-msg error">{{ erroCarregamento }}</p>
+      } @else {
+        <ul class="location-list">
+          @for (local of locaisFiltrados; track local.id) {
+            <li
+              (click)="abrirModal(local)"
+              [class.active]="localSelecionado?.id === local.id"
+            >
+              <strong>{{ local.nome }}</strong>
+              <span class="location-subtitle">{{
+                local.descricao || 'Local do campus'
+              }}</span>
+            </li>
+          } @empty {
+            <li class="status-msg">Nenhum local encontrado.</li>
+          }
+        </ul>
+      }
+    </div>
+  </aside>
 
   <!-- ÁREA DO MAPA -->
-  <div class="map-area" (click)="menuAberto = false">
-    <!-- O container agora abraça a imagem perfeitamente -->
-    <div class="map-container">
-      
-      <!-- IMAGEM -->
-      <img src="assets/mapa-base.png" alt="Mapa da UESC" class="mapa-imagem" style="cursor: crosshair" (click)="capturarCoordenadas($event)">
-      
-      <!-- SVG AMARELO -->
-      <svg class="map-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
-        @if (localSelecionado) {
-          <polygon [attr.points]="getPoligonoSelecao()" class="selection-polygon" />
-          <line [attr.x1]="localSelecionado.coordenadaX" [attr.y1]="localSelecionado.coordenadaY" [attr.x2]="localSelecionado.coordenadaX" [attr.y2]="localSelecionado.coordenadaY - 10" stroke="white" stroke-width="0.2" stroke-dasharray="1,1" />
-        }
-      </svg>
+  <section class="map-area" (click)="menuAberto = false">
+    <div class="map-container" (click)="capturarCoordenadas($event)">
+      <img
+        src="assets/mapa-base.png"
+        alt="Mapa da UESC"
+        class="mapa-imagem"
+      />
 
-      <!-- PINOS -->
-      @for (local of locais; track local.id) {
-        <button class="map-pin" [class.selected]="localSelecionado?.id === local.id" [style.left.%]="local.coordenadaX" [style.top.%]="local.coordenadaY" (click)="abrirModal(local); $event.stopPropagation()" title="{{ local.nome }}">
-          📍
+      <!-- PINOS (usam lista filtrada) -->
+      @for (local of locaisFiltrados; track local.id) {
+        <button
+          class="map-pin"
+          [class.selected]="localSelecionado?.id === local.id"
+          [style.left.%]="local.coordenadaX"
+          [style.top.%]="local.coordenadaY"
+          (click)="abrirModal(local, $event); $event.stopPropagation()"
+          [attr.aria-label]="local.nome"
+          title="{{ local.nome }}"
+        >
+          <span class="pin-dot"></span>
         </button>
       }
 
       <!-- MODAL FLUTUANTE -->
-      @if (localSelecionado) {
-        <div class="modal-popup" [ngStyle]="posicaoModal" (click)="$event.stopPropagation()">
-          
+      @if (localSelecionadoVisivel) {
+        <div
+          class="modal-popup"
+          [ngStyle]="posicaoModal"
+          (click)="$event.stopPropagation()"
+        >
           <div class="modal-header">
-            <h3>{{ localSelecionado.nome }}</h3>
+            <div class="modal-title">
+              <h3>{{ localSelecionado!.nome }}</h3>
+              <p class="modal-subtitle">
+                {{
+                  localSelecionado!.descricao || 'Local do campus da UESC'
+                }}
+              </p>
+            </div>
             <button class="modal-close" (click)="fecharModal()">✕</button>
           </div>
 
           <div class="modal-tabs">
-            <button [class.active]="abaAtual === 'foto'" (click)="mudarAba('foto')" title="Ver Foto">📷</button>
-            <button [class.active]="abaAtual === 'salas'" (click)="mudarAba('salas')" title="Ver Salas">🚪</button>
-            <button [class.active]="abaAtual === 'info'" (click)="mudarAba('info')" title="Informações">ℹ️</button>
+            <button
+              [class.active]="abaAtual === 'foto'"
+              (click)="mudarAba('foto')"
+              title="Ver foto"
+            >
+              📷
+            </button>
+            <button
+              [class.active]="abaAtual === 'salas'"
+              (click)="mudarAba('salas')"
+              title="Ver salas"
+            >
+              🚪
+            </button>
+            <button
+              [class.active]="abaAtual === 'info'"
+              (click)="mudarAba('info')"
+              title="Informações"
+            >
+              ℹ️
+            </button>
           </div>
 
           <div class="modal-content-body">
             <!-- FOTO -->
             @if (abaAtual === 'foto') {
               <div class="tab-foto fade-in">
-                <img [src]="'assets/' + localSelecionado.urlImagem" alt="Foto do Local" onerror="this.src='assets/mapa-base.png'">
+                <img
+                  [src]="'assets/' + localSelecionado!.urlImagem"
+                  alt="Foto do local"
+                  (error)="onErroImagem($event)"
+                />
               </div>
             }
+
             <!-- SALAS -->
             @if (abaAtual === 'salas') {
               <div class="tab-salas fade-in">
@@ -85,18 +155,22 @@
                 }
               </div>
             }
+
             <!-- INFO -->
             @if (abaAtual === 'info') {
               <div class="tab-info fade-in">
-                <p>{{ localSelecionado.descricao }}</p>
-                <hr>
-                <small>ID: {{ localSelecionado.id }}</small>
+                <p class="descricao-modal">
+                  {{
+                    localSelecionado!.descricao || 'Sem descrição detalhada.'
+                  }}
+                </p>
+                <hr />
+                <small class="id-info">ID: {{ localSelecionado!.id }}</small>
               </div>
             }
           </div>
         </div>
       }
-
     </div>
-  </div>
+  </section>
 </div>
