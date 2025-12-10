@@ -17,24 +17,30 @@
     <div class="search-box">
       <input
         type="text"
-        placeholder="Pesquise por nome, prédio ou sala..."
+        placeholder="Digite sala (ex: 3201) ou nome do local..."
         [(ngModel)]="termoBusca"
         (input)="filtrarLocais()"
       />
-
-      <!-- AUTOCOMPLETE / SUGESTÕES -->
-      @if (mostrarSugestoes && locaisFiltrados.length > 0) {
-        <ul class="search-suggestions">
-          @for (local of locaisFiltrados; track local.id) {
-            <li (click)="selecionarSugestao(local)">
-              {{ local.nome }}
-            </li>
-          }
-        </ul>
-      }
     </div>
 
     <div class="sidebar-body">
+      <!-- RESULTADO DA BUSCA POR SALA -->
+      @if (salaBuscada) {
+        <div class="sala-encontrada" (click)="abrirModalSala()">
+          <div class="sala-badge">
+            <span class="sala-icon">🚪</span>
+            <div class="sala-info-text">
+              <strong>{{ salaBuscada.sala }}</strong>
+              <span>{{ salaBuscada.andar }}</span>
+            </div>
+          </div>
+          <p class="sala-direcao">
+            Localizada no <strong>Pavilhão {{ salaBuscada.pavilhao.nome.includes('Pedro') ? 'Pedro Calmon' : salaBuscada.pavilhao.nome.includes('Adonias') ? 'Adonias Filho' : 'Jorge Amado' }}</strong>
+          </p>
+          <span class="sala-hint">Clique para ver no mapa →</span>
+        </div>
+      }
+
       @if (carregando) {
         <p class="status-msg">Carregando locais...</p>
       } @else if (erroCarregamento) {

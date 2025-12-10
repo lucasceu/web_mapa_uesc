@@ -8,6 +8,8 @@ target/
 *.class
 .mvn/
 
-# IDEs and editors
-.pdf
-.zip
+# IDE files
+.vscode/
+*.pdf
+*.zip
+.code-workspace
