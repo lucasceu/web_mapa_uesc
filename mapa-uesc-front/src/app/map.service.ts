@@ -1,19 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http'; // Adicionado HttpParams
 import { Observable } from 'rxjs';
 
-/**
- * Representação do Local.java do backend.
- * Campos opcionais devem estar marcados com "?".
- */
 export interface Local {
   id: number;
   nome: string;
   descricao: string;
-  detalhesSalas?: string;  // pode vir null do backend
+  detalhesSalas?: string;
   coordenadaX: number;
   coordenadaY: number;
-  latitude?: number;   // coordenadas geográficas para rota
+  latitude?: number;
   longitude?: number;
   urlImagem: string;
 }
@@ -23,13 +19,22 @@ export interface Local {
 })
 export class MapService {
 
-  /** Ajuste conforme seu backend */
   private readonly apiUrl = 'http://localhost:8080/api/locais';
 
   constructor(private http: HttpClient) {}
 
-  /** Lista todos os locais cadastrados no backend */
   getLocais(): Observable<Local[]> {
     return this.http.get<Local[]>(this.apiUrl);
   }
+
+  // --- CÓDIGO NOVO ---
+  // Pede ao backend a lista de pontos ordenados para formar o caminho
+  getRota(origemId: number, destinoId: number): Observable<Local[]> {
+    const params = new HttpParams()
+      .set('origem', origemId.toString())
+      .set('destino', destinoId.toString());
+    
+    return this.http.get<Local[]>(`${this.apiUrl}/rota`, { params });
+  }
+  // -------------------
 }
