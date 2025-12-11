@@ -12,9 +12,23 @@
   width: 100%;
   display: grid;
   grid-template-columns: 320px 1fr;
-  background: #f4f6fb;
+  background-color:#059669;
   color: #111827;
   position: relative;
+  transition: grid-template-columns 0.25s ease-out;
+}
+
+.main-container.menu-fechado {
+  grid-template-columns: 0px 1fr;
+}
+
+.sidebar {
+  transform: translateX(0);
+  transition: transform 0.25s ease-out;
+}
+
+.main-container.menu-fechado .sidebar {
+  transform: translateX(-100%);
 }
 
 /* BOTÃO MENU (MOBILE + DESKTOP, efeito real só no mobile) */
@@ -61,10 +75,16 @@
 }
 
 .sidebar-title h2 {
+  font-family: 'Karma', serif;;
   margin: 0;
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: 2.3rem;
+  font-weight: 400;
+  letter-spacing: 0.5px;
   color: #111827;
+}
+
+p {
+  padding-left: 15px;
 }
 
 .sidebar-title p {
@@ -76,10 +96,11 @@
 .close-btn {
   border: none;
   border-radius: 999px;
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 24px;
   cursor: pointer;
-  background: #f3f4f6;
+  background: #e5e6e9;
+  color: #979fac;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -87,27 +108,30 @@
   transition: 0.2s;
 
   &:hover {
-    background: #e5e7eb;
+    background: #d1d2d4;
   }
 }
 
 .search-box {
   margin-top: 4px;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.search-box input {
+input {
   width: 100%;
   border-radius: 999px;
   border: 1px solid #d1d5db;
-  padding: 10px 14px;
+  padding: 7px 14px;
   font-size: 0.92rem;
   background: #f9fafb;
   outline: none;
   transition: 0.2s;
 
   &:focus {
-    border-color: #2563eb;
+    border-color: #eb258b;
     background: #ffffff;
     box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
   }
@@ -298,7 +322,7 @@
   justify-content: center;
   align-items: center;
   overflow: auto;
-  background: #ffffff;
+  background: rgb(88, 170, 24);
 }
 
 /* CONTAINER DAS COORDENADAS */
@@ -306,10 +330,10 @@
   position: relative;
   width: 100%;
   max-width: 1600px; 
-  border-radius: 18px;
+  // border-radius: 18px;
   overflow: hidden;
   background: #58AA18; 
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.22);
+  // box-shadow: 0 20px 45px rgba(15, 23, 42, 0.22);
 }
 
 /* IMAGEM E MAPA */
@@ -591,7 +615,7 @@
 
 @media (max-width: 900px) {
   .main-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   .sidebar {
@@ -599,19 +623,10 @@
     inset: 0 auto 0 0;
     width: 280px;
     transform: translateX(-100%);
-    transition: transform 0.25s ease-out;
-    box-shadow: 10px 0 28px rgba(15, 23, 42, 0.4);
   }
 
   .sidebar.open {
     transform: translateX(0);
   }
-
-  .map-area {
-    padding: 0;
-  }
-
-  .map-container {
-    border-radius: 0;
-  }
 }
+

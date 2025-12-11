@@ -1,4 +1,4 @@
-<div class="main-container">
+<div class="main-container" [class.menu-fechado]="!menuAberto && telaLargaOuHorizontal">
   <!-- BOTÃO HAMBÚRGUER (quando menu fechado – efeito visual só no mobile) -->
   @if (!menuAberto) {
     <button class="menu-btn" (click)="toggleMenu()">☰</button>
@@ -8,7 +8,7 @@
   <aside class="sidebar" [class.open]="menuAberto">
     <div class="sidebar-header">
       <div class="sidebar-title">
-        <h2>📍 Mapa UESC</h2>
+        <h2>📍Mapa UESC</h2>
         <p>Encontre prédios, salas e setores do campus</p>
       </div>
       <button class="close-btn" (click)="toggleMenu()">✕</button>
@@ -17,7 +17,7 @@
     <div class="search-box">
       <input
         type="text"
-        placeholder="Digite sala (ex: 3201) ou nome do local..."
+        placeholder="Digite o nome do local ou nº da sala..."
         [(ngModel)]="termoBusca"
         (input)="filtrarLocais()"
       />

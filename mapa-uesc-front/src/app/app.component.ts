@@ -40,9 +40,32 @@ export class AppComponent implements OnInit {
 
   constructor(private mapService: MapService) {}
 
-  ngOnInit(): void {
+
+  
+  telaLargaOuHorizontal = true;
+
+  ngOnInit() {
     this.carregarLocais();
+    this.checarOrientacao();
+    window.addEventListener('resize', () => this.checarOrientacao());
   }
+
+  checarOrientacao() {
+    const largura = window.innerWidth;
+    const altura = window.innerHeight;
+
+    // Se largura maior que altura → está em paisagem
+    const horizontal = largura > altura;
+
+    // Tela larga é desktop (> 900px)
+    const desktop = largura > 900;
+
+    this.telaLargaOuHorizontal = horizontal || desktop;
+  }
+
+
+
+
 
   private carregarLocais(): void {
     this.carregando = true;
