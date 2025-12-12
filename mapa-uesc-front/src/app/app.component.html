@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-<div class="main-container" [class.menu-fechado]="!menuAberto && telaLargaOuHorizontal">
-  <!-- BOTÃO HAMBÚRGUER (quando menu fechado – efeito visual só no mobile) -->
-=======
 <div class="main-container">
->>>>>>> fidelispapaizinho
+  
   @if (!menuAberto) {
     <button class="menu-btn" (click)="toggleMenu()">☰</button>
   }
@@ -11,19 +7,19 @@
   <aside class="sidebar" [class.open]="menuAberto">
     <div class="sidebar-header">
       <div class="sidebar-title">
-        <h2>📍Mapa UESC</h2>
-        <p>Encontre prédios, salas e setores do campus</p>
+        <h2>📍 Mapa UESC</h2>
+        <p>Campus Soane Nazaré</p>
       </div>
       <button class="close-btn" (click)="toggleMenu()">✕</button>
     </div>
 
     <div class="search-box">
-      <input
-        type="text"
-        placeholder="Digite o nome do local ou nº da sala..."
-        [(ngModel)]="termoBusca"
+      <input 
+        type="text" 
+        placeholder="Buscar local ou sala..." 
+        [(ngModel)]="termoBusca" 
         (input)="filtrarLocais()"
-      />
+      >
     </div>
 
     <div class="sidebar-body">
@@ -37,51 +33,34 @@
             </div>
           </div>
           <p class="sala-direcao">
-            Localizada no <strong>Pavilhão {{ salaBuscada.pavilhao.nome.includes('Pedro') ? 'Pedro Calmon' : salaBuscada.pavilhao.nome.includes('Adonias') ? 'Adonias Filho' : 'Jorge Amado' }}</strong>
+            Localizada no <strong>{{ salaBuscada.pavilhao.nome }}</strong>
           </p>
           <span class="sala-hint">Clique para ver no mapa →</span>
         </div>
       }
 
-      @if (carregando) {
-        <p class="status-msg">Carregando locais...</p>
-      } @else if (erroCarregamento) {
-        <p class="status-msg error">{{ erroCarregamento }}</p>
-      } @else {
-        <ul class="location-list">
-          @for (local of locaisFiltrados; track local.id) {
-            <li
-              (click)="abrirModal(local)"
-              [class.active]="localSelecionado?.id === local.id"
-            >
-              <strong>{{ local.nome }}</strong>
-              <span class="location-subtitle">{{
-                local.descricao || 'Local do campus'
-              }}</span>
-            </li>
-          } @empty {
-            <li class="status-msg">Nenhum local encontrado.</li>
-          }
-        </ul>
-      }
+      <ul class="location-list">
+        @for (local of locaisFiltrados; track local.id) {
+          <li (click)="abrirModal(local)" [class.active]="localSelecionado?.id === local.id">
+            <strong>{{ local.nome }}</strong>
+            <span class="location-subtitle">{{ local.descricao }}</span>
+          </li>
+        }
+      </ul>
     </div>
   </aside>
 
   <section class="map-area" (click)="menuAberto = false">
-    <div class="map-container" (click)="capturarCoordenadas($event)">
+    <div class="map-container">
       
-      <img
-        src="assets/mapa-base.png"
-        alt="Mapa da UESC"
-        class="mapa-imagem"
-      />
+      <img src="assets/mapa-base.png" alt="Mapa UESC" class="mapa-imagem" (error)="onErroImagem($event)">
 
       <svg class="mapa-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
         @if (caminhoSVG) {
           <path [attr.d]="caminhoSVG" 
                 fill="none" 
                 stroke="#ef4444" 
-                stroke-width="1.5" 
+                stroke-width="1.2" 
                 stroke-dasharray="2" 
                 class="rota-animada" />
         }
@@ -95,7 +74,6 @@
           [style.left.%]="local.coordenadaX"
           [style.top.%]="local.coordenadaY"
           (click)="abrirModal(local, $event); $event.stopPropagation()"
-          [attr.aria-label]="local.nome"
           title="{{ local.nome }}"
         >
           <span class="pin-dot"></span>
@@ -103,70 +81,36 @@
       }
 
       @if (localSelecionadoVisivel) {
-        <div
-          class="modal-popup"
-          [ngStyle]="posicaoModal"
-          (click)="$event.stopPropagation()"
-        >
+        <div class="modal-popup" [ngStyle]="posicaoModal" (click)="$event.stopPropagation()">
           <div class="modal-header">
             <div class="modal-title">
               <h3>{{ localSelecionado!.nome }}</h3>
-              <p class="modal-subtitle">
-                {{
-                  localSelecionado!.descricao || 'Local do campus da UESC'
-                }}
-              </p>
             </div>
             <button class="modal-close" (click)="fecharModal()">✕</button>
           </div>
-
+          
           <div class="modal-tabs">
-            <button
-              [class.active]="abaAtual === 'foto'"
-              (click)="mudarAba('foto')"
-              title="Ver foto"
-            >
-              📷
-            </button>
-            <button
-              [class.active]="abaAtual === 'salas'"
-              (click)="mudarAba('salas')"
-              title="Ver salas"
-            >
-              🚪
-            </button>
-            <button
-              [class.active]="abaAtual === 'info'"
-              (click)="mudarAba('info')"
-              title="Informações"
-            >
-              ℹ️
-            </button>
+            <button [class.active]="abaAtual === 'foto'" (click)="mudarAba('foto')">📷</button>
+            <button [class.active]="abaAtual === 'salas'" (click)="mudarAba('salas')">🚪</button>
+            <button [class.active]="abaAtual === 'info'" (click)="mudarAba('info')">ℹ️</button>
           </div>
 
           <div class="modal-content-body">
             @if (abaAtual === 'foto') {
               <div class="tab-foto fade-in">
-                <img
-                  [src]="'assets/' + localSelecionado!.urlImagem"
-                  alt="Foto do local"
-                  (error)="onErroImagem($event)"
-                />
+                 <img [src]="'assets/' + localSelecionado!.urlImagem" (error)="onErroImagem($event)">
               </div>
             }
 
             @if (abaAtual === 'salas') {
               <div class="tab-salas fade-in">
-                @if (getListaSalas().length > 0) {
-                  <div class="salas-container">
-                    @for (item of getListaSalas(); track $index) {
-                      <div class="sala-row">
-                        <div class="sala-andar">{{ item.andar }}</div>
-                        <div class="sala-info">{{ item.salas }}</div>
-                      </div>
-                    }
+                @for (item of getListaSalas(); track $index) {
+                  <div class="sala-row">
+                    <div class="sala-andar">{{ item.andar }}</div>
+                    <div class="sala-info">{{ item.salas }}</div>
                   </div>
-                } @else {
+                }
+                @if (getListaSalas().length === 0) {
                   <p class="empty-msg">Sem informações de salas.</p>
                 }
               </div>
@@ -174,24 +118,20 @@
 
             @if (abaAtual === 'info') {
               <div class="tab-info fade-in">
-                <p class="descricao-modal">
-                  {{
-                    localSelecionado!.descricao || 'Sem descrição detalhada.'
-                  }}
-                </p>
-                <hr />
-                <small class="id-info">ID: {{ localSelecionado!.id }}</small>
+                <p class="descricao-modal">{{ localSelecionado!.descricao }}</p>
               </div>
             }
           </div>
 
           <div class="modal-footer">
             <button class="btn-rota" (click)="tracarRota(localSelecionado!)">
-              🧭 Como Chegar
+              🧭 Traçar Rota
             </button>
           </div>
+
         </div>
       }
+
     </div>
   </section>
 </div>
