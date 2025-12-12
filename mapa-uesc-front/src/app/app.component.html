@@ -1,10 +1,13 @@
+<<<<<<< HEAD
 <div class="main-container" [class.menu-fechado]="!menuAberto && telaLargaOuHorizontal">
   <!-- BOTÃO HAMBÚRGUER (quando menu fechado – efeito visual só no mobile) -->
+=======
+<div class="main-container">
+>>>>>>> fidelispapaizinho
   @if (!menuAberto) {
     <button class="menu-btn" (click)="toggleMenu()">☰</button>
   }
 
-  <!-- SIDEBAR -->
   <aside class="sidebar" [class.open]="menuAberto">
     <div class="sidebar-header">
       <div class="sidebar-title">
@@ -24,7 +27,6 @@
     </div>
 
     <div class="sidebar-body">
-      <!-- RESULTADO DA BUSCA POR SALA -->
       @if (salaBuscada) {
         <div class="sala-encontrada" (click)="abrirModalSala()">
           <div class="sala-badge">
@@ -65,20 +67,31 @@
     </div>
   </aside>
 
-  <!-- ÁREA DO MAPA -->
   <section class="map-area" (click)="menuAberto = false">
     <div class="map-container" (click)="capturarCoordenadas($event)">
+      
       <img
         src="assets/mapa-base.png"
         alt="Mapa da UESC"
         class="mapa-imagem"
       />
 
-      <!-- PINOS (usam lista filtrada) -->
+      <svg class="mapa-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+        @if (caminhoSVG) {
+          <path [attr.d]="caminhoSVG" 
+                fill="none" 
+                stroke="#ef4444" 
+                stroke-width="1.5" 
+                stroke-dasharray="2" 
+                class="rota-animada" />
+        }
+      </svg>
+
       @for (local of locaisFiltrados; track local.id) {
         <button
           class="map-pin"
           [class.selected]="localSelecionado?.id === local.id"
+          [class.in-route]="isLocalNaRota(local)" 
           [style.left.%]="local.coordenadaX"
           [style.top.%]="local.coordenadaY"
           (click)="abrirModal(local, $event); $event.stopPropagation()"
@@ -89,7 +102,6 @@
         </button>
       }
 
-      <!-- MODAL FLUTUANTE -->
       @if (localSelecionadoVisivel) {
         <div
           class="modal-popup"
@@ -133,7 +145,6 @@
           </div>
 
           <div class="modal-content-body">
-            <!-- FOTO -->
             @if (abaAtual === 'foto') {
               <div class="tab-foto fade-in">
                 <img
@@ -144,7 +155,6 @@
               </div>
             }
 
-            <!-- SALAS -->
             @if (abaAtual === 'salas') {
               <div class="tab-salas fade-in">
                 @if (getListaSalas().length > 0) {
@@ -162,7 +172,6 @@
               </div>
             }
 
-            <!-- INFO -->
             @if (abaAtual === 'info') {
               <div class="tab-info fade-in">
                 <p class="descricao-modal">
@@ -176,9 +185,8 @@
             }
           </div>
 
-          <!-- BOTÃO COMO CHEGAR -->
           <div class="modal-footer">
-            <button class="btn-rota" (click)="abrirRota(localSelecionado!)">
+            <button class="btn-rota" (click)="tracarRota(localSelecionado!)">
               🧭 Como Chegar
             </button>
           </div>
