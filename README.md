@@ -1,7 +1,12 @@
-# Projeto de WEB com Angular e Spring Boot
+# 🗺️ Projeto de WEB - Mapa Interativo UESC
 
-**Equipe:**
+Este projeto consiste em um sistema de navegação e visualização espacial do campus da UESC (Universidade Estadual de Santa Cruz). Utiliza uma arquitetura moderna com Spring Boot no Back-end para processamento de rotas e Angular (v17+) no Front-end para renderização interativa.
 
+Repositório: https://github.com/lucasceu/web_mapa_uesc
+
+---
+
+## 👥 Equipe
 - Henrique Daniel Resende
 - João Manoel Fidelis Santos
 - Lucas Pereira Céu
@@ -9,70 +14,102 @@
 - Ryan Araujo Ribeiro
 - Sara Raquel Pinto Brandao Silva
 
-## Objetivo
+---
 
-Este projeto tem como objetivo a implementação de um mapa aprimorado da UESC, utilizando a mesma imagem estática, a fim de demonstrar os conhecimentos aprendidos na disciplina de WEB através da framework Angular e da ferramenta Spring Boot.
+## 🎯 Objetivo
+Implementar um mapa aprimorado da UESC utilizando uma imagem estática como base, permitindo localizar prédios e traçar rotas otimizadas entre a guarita e qualquer ponto do campus.
 
-## Estrutura de Pastas Principais
+---
 
-**mapa-backend (Spring Boot)**  
- ┗ src/main                
-    ┗ java/com/uesc/mapa_backend/   
-        ┣ MapaBackendApplication.java -> classe principal com main, sobe o servidor  
-        ┣ DataLoader.java -> preenche o banco com 47 locais na inicialização    
-        ┣ controller  
-        ┃ ┗ LocalController.java -> endpoint, lista todos os locais  
-        ┣ model  
-        ┃ ┗ Local.java -> Cria um local (tabela no banco) com todos os seus atributos  
-        ┗ repository    
-          ┗ LocalRepository.java  -> Cria interface com todo o SQL já criado pela classe extendida
+## 🚀 Funcionalidades Implementadas
 
-**Fluxo de Navegação**
+### Back-end (Spring Boot)
+- Algoritmo de Dijkstra.
+- API REST (GET /api/locais, GET /api/locais/rota).
+- DataLoader com 47 locais e conexões.
+- Compatibilidade Java 21.
 
-                    [MapaBackendApplication.java]
-                      \          |          /
-  [LocalController.java] [DataLoader.java] [LocalRepository.java]  
-            |                    |  
-  [LocalRepository.java] -> [Local.java]  
+### Front-end (Angular)
+- Suporte SSR com isPlatformBrowser.
+- Rota desenhada em SVG via path.
+- Pinos interativos com mudança de cor.
+- Modais responsivos.
+- Trava de proporção CSS.
 
-**mapa-uesc-front**  
-  ┣ src         
-  ┃ ┣ assets -> imagem do mapa e dos locais  
-  ┃ ┣ app  
-  ┃ ┣ ┣ app.component.ts -> componente principal com toda a lógica da tela  
-  ┃ ┣ ┗ map.service.ts -> faz a chamada HTTP ao backend  
-  ┃ ┣ main.ts -> ponto de entrada que inicializa o AppComponent    
-  ┃ ┗ main.server.ts -> usado pelo server.ts para renderização  
-  ┗ server.ts ->  renderização do servidor SSR  
+---
 
-**Fluxo de Navegação**
+## 📂 Estrutura do Projeto
 
-SSR:  
-  [server.ts] -> [main.server.ts] -> [app.component.ts] -> [map.service.ts]
+### Back-end (mapa-backend)
+    src/main/java/com/uesc/mapa_backend/
+    ┣ controller/
+    ┃ ┗ LocalController.java
+    ┣ model/
+    ┃ ┗ Local.java
+    ┣ repository/
+    ┃ ┗ LocalRepository.java
+    ┣ service/
+    ┃ ┗ GrafoService.java
+    ┣ DataLoader.java
+    ┗ MapaBackendApplication.java
 
-Cliente:  
-  [main.ts] -> [app.component.ts] -> [map.service.ts]
+### Front-end (mapa-uesc-front)
+    src/
+    ┣ assets/
+    ┣ app/
+    ┃ ┣ app.component.ts
+    ┃ ┣ app.component.html
+    ┃ ┣ app.component.scss
+    ┃ ┗ map.service.ts
+    ┣ main.ts
+    ┗ main.server.ts
 
+---
 
-[Link do Repositório no GitHub](https://github.com/lucasceu/web_mapa_uesc)
+## 🛠️ Instalação e Execução
 
-## Executar
+### Requisitos
+- Java JDK 21
+- Node.js 18+
 
-1. Back-end - Spring Boot
-  - Clique em `run` no arquivo do caminho `\web_mapa_uesc\mapa-backend\src\main\java\com\uesc\mapa_backend\MapaBackendApplication.java`
+### 1. Executar o Back-end
+    Rodar classe:
+    src/main/java/com/uesc/mapa_backend/MapaBackendApplication.java
 
-  - Ou pressione F5 em qualquer arquivo Java do back-end
+Acesso:
+    http://localhost:8080
 
-2. Front-end - Angular
-  - Na pasta do front-end:
-
-    ```bash
-    npm i
-    ```
-
-    ```bash
+### 2. Executar o Front-end
+    npm install
     npm start
-    ```
-    (ou `ng server`)
 
-    **Acessar**: http://localhost:4200
+Acesso:
+    http://localhost:4200
+
+---
+
+## 🔧 Debug e Manutenção (Mapslaoq)
+
+### 1. Pinos desalinhados
+Manter no SCSS:
+    aspect-ratio: 1083 / 755;
+    object-fit: contain;
+    object-position: top left;
+
+Ajustar coordenadas no DataLoader.criar().
+
+### 2. Rota não aparece
+Grafo desconexo. Verificar conexões via conectar() no DataLoader.java.
+
+### 3. Erro "window is not defined"
+    if (isPlatformBrowser(this.platformId)) {
+        // uso de window, document, localStorage
+    }
+
+### 4. Conflitos Git
+Branch estável: production.  
+Priorizar lógica de rotas e SSR no app.component.ts.
+
+---
+
+Fim do README.md.
